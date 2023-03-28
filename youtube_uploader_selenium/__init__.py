@@ -13,6 +13,7 @@ from .Constant import *
 from pathlib import Path
 import logging
 import platform
+import os
 
 logging.basicConfig()
 
@@ -60,7 +61,14 @@ class YouTubeUploader:
 	def upload(self):
 		try:
 			self.__login()
-			return self.__upload()
+			path = r'E:\uplaod'
+			files = os.listdir(path)
+			for file in files:
+				video_path = os.path.join(path, file)
+				video_name = file[file.rfind('\\') + 1:file.rfind('.')]
+				self.__upload(video_path, video_name)
+			return None
+			# return self.__upload()
 		except Exception as e:
 			print(e)
 			self.__quit()
@@ -102,7 +110,7 @@ class YouTubeUploader:
 
 		field.send_keys(string)
 
-	def __upload(self) -> Tuple[bool, Optional[str]]:
+	def __upload(self, video_path, video_title) -> Tuple[bool, Optional[str]]:
 		edit_mode = self.metadata_dict[Constant.VIDEO_EDIT]
 		if edit_mode:
 			self.browser.get(edit_mode)
@@ -112,7 +120,8 @@ class YouTubeUploader:
 			time.sleep(Constant.USER_WAITING_TIME)
 			self.browser.get(Constant.YOUTUBE_UPLOAD_URL)
 			time.sleep(Constant.USER_WAITING_TIME)
-			absolute_video_path = str(Path.cwd() / self.video_path)
+			# absolute_video_path = str(Path.cwd() / self.video_path)
+			absolute_video_path = str(video_path)
 			self.browser.find(By.XPATH, Constant.INPUT_FILE_VIDEO).send_keys(
 				absolute_video_path)
 			self.logger.debug('Attached video {}'.format(self.video_path))
@@ -135,7 +144,7 @@ class YouTubeUploader:
 		title_field, description_field = self.browser.find_all(By.ID, Constant.TEXTBOX_ID, timeout=15)
 
 		self.__write_in_field(
-			title_field, self.metadata_dict[Constant.VIDEO_TITLE], select_all=True)
+			title_field, video_title, select_all=True)
 		self.logger.debug('The video title was set to \"{}\"'.format(
 			self.metadata_dict[Constant.VIDEO_TITLE]))
 
@@ -257,7 +266,7 @@ class YouTubeUploader:
 			"Published the video with video_id = {}".format(video_id))
 		time.sleep(Constant.USER_WAITING_TIME)
 		self.browser.get(Constant.YOUTUBE_URL)
-		self.__quit()
+		# self.__quit()
 		return True, video_id
 
 	def __get_video_id(self) -> Optional[str]:
