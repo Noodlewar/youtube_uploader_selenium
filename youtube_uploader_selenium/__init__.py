@@ -61,13 +61,21 @@ class YouTubeUploader:
     def upload(self):
         try:
             self.__login()
-            path = r'E:\uplaod'
+            path = str(Path.cwd() / 'upload')
             files = os.listdir(path)
+            was_video_uploaded = False
+            video_id = None
             for file in files:
                 video_path = os.path.join(path, file)
                 video_name = file[file.rfind('\\') + 1:file.rfind('.')]
-                self.__upload(video_path, video_name)
-            return None
+                print(video_path)
+                print(video_name)
+                was_video_uploaded, video_id = self.__upload(video_path, video_name)
+                os.remove(video_path)
+                if not was_video_uploaded:
+                    break
+
+            return was_video_uploaded, video_id
         # return self.__upload()
         except Exception as e:
             print(e)
@@ -246,7 +254,9 @@ class YouTubeUploader:
         uploading_status_container = self.browser.find(By.XPATH, Constant.UPLOADING_STATUS_CONTAINER)
         while uploading_status_container is not None:
             uploading_progress = uploading_status_container.get_attribute('value')
-            self.logger.debug('Upload video progress: {}%'.format(uploading_progress))
+            uploading_progress = self.browser.find(By.CLASS_NAME, "progress-label")
+            print(uploading_progress.text)
+            self.logger.debug('Upload video progress: {}'.format(uploading_progress.text))
             time.sleep(Constant.USER_WAITING_TIME * 5)
             uploading_status_container = self.browser.find(By.XPATH, Constant.UPLOADING_STATUS_CONTAINER)
 
