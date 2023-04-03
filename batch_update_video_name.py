@@ -1,6 +1,7 @@
 import os
 
-path = r'E:\仙尊归来当赘婿'
+video_name = '仙尊归来当赘婿'
+path = 'E:\\' + video_name
 files = os.listdir(path)
 
 # 遍历所有文件
@@ -15,6 +16,7 @@ for file in files:
     if type != 'mp4':
         continue
     # 构造新文件名
-    new_name = os.path.join(path, '【知秋剧场】《重返80年代发大财》EP' + name + ' #大陆 #重生 #80年代 #暴富 #完结.' + type)
+    new_name = os.path.join(path,
+                            '【知秋剧场】《' + video_name + '》EP' + name + ' #大陆 #重生 #80年代 #暴富 #完结.' + type)
     # 重命名文件
     # os.rename(old_name, new_name)
